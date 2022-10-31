@@ -10,7 +10,7 @@
     lib = rec {
       midgardOverlay = overlay: (final: prev: { midgard = (prev.midgard or { }) // (overlay final prev); });
       mapMidgardOverlay = mapAttrs (_: overlay: midgardOverlay overlay);
-      importDir = dir: mapAttrs' (n: v: nameValuePair (removeSuffix ".nix" n) (import "${dir}/${n}")) (readDir dir);
+      importDir = dir: mapAttrs' (n: v: nameValuePair (removeSuffix ".nix" n) dir/${n}) (readDir dir);
     };
 
   };
