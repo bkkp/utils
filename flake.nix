@@ -13,5 +13,7 @@
       importDir = dir: mapAttrs' (n: v: nameValuePair (removeSuffix ".nix" n) (import "${dir}/${n}")) (readDir dir);
     };
 
+    packages.x86_64-linux.systemd-utils = import ./systemd nixpkgs;
+
   };
 }
