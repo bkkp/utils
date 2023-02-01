@@ -24,6 +24,7 @@ in
     ExecStartPre = "${expowait}/bin/expowait ${service} ${toString expo} ${toString maxWaitSec}";
     ExecStartPost = "${resetWrap}/bin/resetwrap ${service} ${toString resetSec} ${toString resetCheckInterval}";
     Restart = "always";
+    TimeoutStartSec = (maxWaitSec + 10);
   };
   unitConfig.StartLimitIntervalSec = 0;
 }
