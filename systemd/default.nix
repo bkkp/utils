@@ -3,8 +3,7 @@ pkgs:
   service,
   expo ? 3,
   maxWaitSec ? 3600,
-  resetSec ? 60,
-  resetCheckInterval ? 10
+  resetSec ? 60
 }:
 let
   inherit (builtins) readFile toString;
@@ -14,15 +13,13 @@ let
   resetfailed = pkgs.writeShellApplication {
     name = "resetfailed"; text = readFile ./resetfailed.sh;
   };
-  resetWrap = pkgs.writeShellApplication {  # Cannot use & directly in ExecStartPost
-    name = "resetwrap"; text = ''${resetfailed}/bin/resetfailed "$1" "$2" "$3" &'';
-  };
+  parseInt = x: assert builtins.isInt x; (toString x);
 
 in
 {
   serviceConfig = {
-    ExecStartPre = "${expowait}/bin/expowait ${service} ${toString expo} ${toString maxWaitSec}";
-    ExecStartPost = "${resetWrap}/bin/resetwrap ${service} ${toString resetSec} ${toString resetCheckInterval}";
+    ExecStartPre = "${expowait}/bin/expowait ${service} ${parseInt expo} ${parseInt maxWaitSec}";
+    ExecStopPost = "${resetfailed}/bin/resetfailed ${service} ${parseInt resetSec}";
     Restart = "always";
     TimeoutStartSec = (maxWaitSec + 10);
   };
