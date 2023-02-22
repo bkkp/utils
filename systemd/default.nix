@@ -3,7 +3,7 @@ pkgs:
   service,
   expo ? 3,
   maxWaitSec ? 3600,
-  resetSec ? 60
+  resetSec ? 600
 }:
 let
   inherit (builtins) readFile toString;
