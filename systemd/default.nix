@@ -3,10 +3,11 @@ pkgs:
   service,
   expo ? 3,
   maxWaitSec ? 3600,
-  resetSec ? 600
+  resetSec ? 600,
+  maxRetries ? null
 }:
 let
-  inherit (builtins) readFile toString;
+  inherit (builtins) readFile toString isNull;
   expowait = pkgs.writeShellApplication {
     name = "expowait"; text = readFile ./expowait.sh;
   };
@@ -14,6 +15,7 @@ let
     name = "resetfailed"; text = readFile ./resetfailed.sh;
   };
   parseInt = x: assert builtins.isInt x; (toString x);
+  # assertInt = x: assert builtins.isInt x; x;
 
 in
 {
@@ -23,7 +25,12 @@ in
     Restart = "always";
     TimeoutStartSec = (maxWaitSec + 10);
   };
-  unitConfig.StartLimitIntervalSec = 0;
+  unitConfig = if (isNull maxRetries)
+    then { StartLimitIntervalSec = 0;}
+    else {
+      StartLimitIntervalSec = maxWaitSec*(maxRetries+1);
+      StartLimitBurst = maxRetries;
+    };
 }
 
 
